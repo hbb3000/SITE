@@ -1,1106 +1,969 @@
 
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>TextFlow | تبدیل متن به PDF</title>
-  <meta name="description" content="با TextFlow متن خود را ویرایش کنید، اندازه و فونت را تنظیم کنید و به کمک مرورگر در قالب PDF ذخیره کنید.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://hbb3000.github.io/SITE/">
-
-  <meta property="og:title" content="TextFlow | تبدیل متن به PDF">
-  <meta property="og:description" content="ابزاری ساده و زیبا برای نوشتن، ویرایش و ذخیره متن به صورت PDF.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://hbb3000.github.io/SITE/">
-  <meta name="theme-color" content="#080d1b">
-
-  <style>
-    :root {
-      --bg: #080d1b;
-      --panel: rgba(17, 26, 48, 0.82);
-      --panel-light: rgba(25, 38, 67, 0.88);
-      --blue: #528bff;
-      --blue-light: #7ab0ff;
-      --text: #edf3ff;
-      --muted: #94a5c5;
-      --border: rgba(124, 164, 255, 0.17);
-      --radius: 22px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font-family: Tahoma, Arial, sans-serif;
-      background:
-        radial-gradient(ellipse at 10% 5%,
-          rgba(36, 105, 220, 0.22), transparent 35%),
-        radial-gradient(ellipse at 90% 85%,
-          rgba(66, 56, 220, 0.19), transparent 38%),
-        radial-gradient(ellipse at 50% 45%,
-          rgba(20, 55, 110, 0.12), transparent 55%),
-        var(--bg);
-      line-height: 1.8;
-      overflow-x: hidden;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button,
-    select {
-      cursor: pointer;
-    }
-
-    button:focus-visible,
-    input:focus-visible,
-    select:focus-visible,
-    textarea:focus-visible {
-      outline: 2px solid var(--blue-light);
-      outline-offset: 3px;
-    }
-
-    /* نور آبی دنبال‌کننده موس */
-    .mouse-glow {
-      position: fixed;
-      top: -500px;
-      left: -500px;
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
-      background: radial-gradient(
-        circle,
-        rgba(64, 124, 255, 0.20) 0%,
-        rgba(68, 105, 255, 0.10) 32%,
-        rgba(64, 124, 255, 0.035) 60%,
-        transparent 72%
-      );
-      transform: translate(-50%, -50%);
-      will-change: left, top;
-    }
-
-    .site-header,
-    .page,
-    .site-footer {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* سربرگ */
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      border-bottom: 1px solid rgba(124, 164, 255, 0.12);
-      background: rgba(8, 13, 27, 0.76);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
-
-    .header-inner {
-      max-width: 1400px;
-      min-height: 78px;
-      padding: 12px 28px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      direction: ltr;
-    }
-
-    .brand-icon {
-      display: grid;
-      place-items: center;
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      color: white;
-      font-size: 23px;
-      font-weight: bold;
-      background: linear-gradient(135deg, #6ba5ff, #3859ef);
-      box-shadow: 0 0 26px rgba(75, 125, 255, 0.30);
-    }
-
-    .brand-name {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      font-size: 23px;
-      letter-spacing: -0.8px;
-      line-height: 1.2;
-    }
-
-    .brand-name span {
-      color: var(--blue-light);
-    }
-
-    .brand-subtitle {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.4px;
-    }
-
-    .header-badge {
-      padding: 7px 13px;
-      color: #b7d1ff;
-      font-size: 12px;
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      background: rgba(66, 115, 220, 0.09);
-      white-space: nowrap;
-    }
-
-    /* محتوای اصلی */
-    .page {
-      width: min(1200px, calc(100% - 36px));
-      margin: auto;
-      padding: 48px 0 38px;
-    }
-
-    .hero {
-      text-align: center;
-      margin: 0 auto 35px;
-      max-width: 760px;
-    }
-
-    .hero-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      color: #a9c9ff;
-      font-size: 12px;
-      border: 1px solid var(--border);
-      border-radius: 30px;
-      background: rgba(62, 105, 210, 0.10);
-    }
-
-    .hero-label::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #6ca2ff;
-      box-shadow: 0 0 12px #528bff;
-    }
-
-    .hero h2 {
-      margin: 18px 0 10px;
-      font-size: clamp(28px, 5vw, 46px);
-      line-height: 1.5;
-      letter-spacing: -1.2px;
-      text-shadow: 0 0 28px rgba(75, 130, 255, 0.15);
-    }
-
-    .hero h2 span {
-      color: #79aaff;
-    }
-
-    .hero p {
-      max-width: 600px;
-      margin: auto;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* چیدمان و پنل‌ها */
-    .workspace {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 310px;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .panel {
-      min-width: 0;
-      padding: 22px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--panel);
-      box-shadow:
-        0 18px 55px rgba(0, 0, 0, 0.25),
-        0 0 25px rgba(55, 110, 255, 0.035);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      transition: border-color 0.3s, box-shadow 0.3s,
-                  transform 0.3s;
-    }
-
-    .panel:hover {
-      border-color: rgba(90, 145, 255, 0.32);
-      box-shadow:
-        0 20px 58px rgba(0, 0, 0, 0.30),
-        0 0 30px rgba(55, 110, 255, 0.08);
-    }
-
-    .panel-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .panel-heading h3 {
-      margin: 0;
-      font-size: 17px;
-    }
-
-    .panel-heading p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .live-indicator {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #9db8e9;
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .live-indicator::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #69d9b0;
-      box-shadow: 0 0 10px rgba(105, 217, 176, 0.6);
-    }
-
-    /* نوار ابزار */
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 9px;
-      padding: 12px;
-      margin-bottom: 13px;
-      border: 1px solid rgba(124, 164, 255, 0.12);
-      border-radius: 14px;
-      background: rgba(5, 10, 23, 0.45);
-    }
-
-    .tool-button,
-    .tool-select {
-      min-height: 39px;
-      padding: 7px 11px;
-      color: #dce8ff;
-      border: 1px solid rgba(124, 164, 255, 0.17);
-      border-radius: 9px;
-      background: rgba(37, 53, 86, 0.65);
-      transition: 0.2s ease;
-    }
-
-    .tool-button:hover,
-    .tool-select:hover {
-      border-color: rgba(100, 155, 255, 0.65);
-      background: rgba(65, 104, 180, 0.25);
-    }
-
-    .tool-button.active {
-      color: white;
-      border-color: #6399ff;
-      background: rgba(73, 119, 225, 0.32);
-      box-shadow: 0 0 15px rgba(64, 124, 255, 0.13);
-    }
-
-    .tool-button strong {
-      font-family: Arial, sans-serif;
-      font-size: 15px;
-    }
-
-    .tool-select {
-      max-width: 100%;
-    }
-
-    .tool-select option,
-    .field select option {
-      color: #111827;
-      background: #fff;
-    }
-
-    /* ویرایشگر متن */
-    .editor-wrap {
-      position: relative;
-    }
-
-    #editor {
-      display: block;
-      width: 100%;
-      min-height: 390px;
-      padding: 22px;
-      resize: vertical;
-      color: #f0f4ff;
-      background: rgba(5, 10, 22, 0.48);
-      border: 1px solid rgba(124, 164, 255, 0.16);
-      border-radius: 15px;
-      line-height: 2;
-      direction: auto;
-      text-align: start;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    #editor::placeholder {
-      color: #7183a5;
-      opacity: 1;
-    }
-
-    #editor:focus {
-      border-color: rgba(95, 151, 255, 0.65);
-      box-shadow: 0 0 0 4px rgba(64, 124, 255, 0.09);
-    }
-
-    .editor-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 13px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .counter-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
-    .counter-group strong {
-      color: #d9e6ff;
-      font-weight: normal;
-    }
-
-    .privacy-note {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* تنظیمات */
-    .settings-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 19px;
-    }
-
-    .settings-panel .panel-heading {
-      margin-bottom: 0;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .field label {
-      color: #c5d3ee;
-      font-size: 12px;
-    }
-
-    .field input,
-    .field select {
-      width: 100%;
-      min-height: 43px;
-      padding: 9px 12px;
-      color: var(--text);
-      border: 1px solid rgba(124, 164, 255, 0.19);
-      border-radius: 10px;
-      background: rgba(5, 10, 23, 0.52);
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .field input:focus,
-    .field select:focus {
-      outline: none;
-      border-color: #6095ff;
-      box-shadow: 0 0 0 3px rgba(64, 124, 255, 0.13);
-    }
-
-    .field input[type="color"] {
-      height: 45px;
-      padding: 5px;
-      cursor: pointer;
-    }
-
-    .hint {
-      margin: -2px 0 0;
-      color: #8093b5;
-      font-size: 11px;
-      line-height: 1.8;
-    }
-
-    .divider {
-      height: 1px;
-      background: rgba(124, 164, 255, 0.12);
-    }
-
-    .download-button,
-    .clear-button {
-      width: 100%;
-      min-height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      padding: 11px 14px;
-      border-radius: 12px;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s,
-                  background 0.2s;
-    }
-
-    .download-button {
-      color: white;
-      border: 1px solid rgba(143, 184, 255, 0.5);
-      background: linear-gradient(135deg, #477fff, #4259ed);
-      box-shadow: 0 7px 25px rgba(64, 124, 255, 0.18);
-    }
-
-    .download-button:hover {
-      transform: translateY(-2px);
-      box-shadow:
-        0 10px 28px rgba(64, 124, 255, 0.32),
-        0 0 24px rgba(64, 124, 255, 0.16);
-    }
-
-    .clear-button {
-      color: #c9d6ee;
-      border: 1px solid rgba(124, 164, 255, 0.18);
-      background: rgba(37, 53, 86, 0.42);
-    }
-
-    .clear-button:hover {
-      color: white;
-      border-color: rgba(100, 150, 255, 0.5);
-      background: rgba(60, 82, 133, 0.35);
-    }
-
-    .format-note {
-      padding: 13px;
-      color: #a8c5f5;
-      font-size: 11px;
-      line-height: 1.9;
-      border: 1px solid rgba(91, 143, 255, 0.15);
-      border-radius: 11px;
-      background: rgba(54, 95, 183, 0.09);
-    }
-
-    /* راهنما و پایین صفحه */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-top: 24px;
-    }
-
-    .feature {
-      padding: 17px;
-      border: 1px solid rgba(124, 164, 255, 0.12);
-      border-radius: 15px;
-      background: rgba(17, 26, 48, 0.48);
-    }
-
-    .feature-icon {
-      display: grid;
-      place-items: center;
-      width: 37px;
-      height: 37px;
-      margin-bottom: 9px;
-      border-radius: 11px;
-      color: #a9c9ff;
-      background: rgba(73, 119, 225, 0.17);
-      font-size: 18px;
-    }
-
-    .feature h4 {
-      margin: 0 0 5px;
-      font-size: 13px;
-    }
-
-    .feature p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.9;
-    }
-
-    .site-footer {
-      padding: 22px 15px 30px;
-      color: #7284a6;
-      text-align: center;
-      font-size: 11px;
-      border-top: 1px solid rgba(124, 164, 255, 0.10);
-    }
-
-    .site-footer span {
-      color: #8db6ff;
-    }
-
-    /* اعلان کوتاه سایت */
-    .toast {
-      position: fixed;
-      z-index: 30;
-      bottom: 22px;
-      left: 22px;
-      max-width: calc(100% - 44px);
-      padding: 12px 17px;
-      color: #eef4ff;
-      border: 1px solid rgba(124, 164, 255, 0.28);
-      border-radius: 12px;
-      background: #152344;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-      font-size: 13px;
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
-      transition: opacity 0.25s, transform 0.25s;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* محتوایی که فقط برای چاپ/PDF نمایش داده می‌شود */
-    .print-document {
-      display: none;
-    }
-
-    @media (max-width: 900px) {
-      .workspace {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .settings-panel {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: start;
-      }
-
-      .settings-panel .panel-heading,
-      .settings-panel .divider,
-      .settings-panel .format-note,
-      .settings-panel .download-button,
-      .settings-panel .clear-button {
-        grid-column: 1 / -1;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .header-inner {
-        padding: 12px 17px;
-      }
-
-      .header-badge {
-        display: none;
-      }
-
-      .page {
-        width: calc(100% - 22px);
-        padding-top: 30px;
-      }
-
-      .hero {
-        margin-bottom: 25px;
-      }
-
-      .panel {
-        padding: 15px;
-        border-radius: 17px;
-      }
-
-      .toolbar {
-        gap: 7px;
-        padding: 9px;
-      }
-
-      .tool-button,
-      .tool-select {
-        min-height: 37px;
-        padding: 6px 9px;
-        font-size: 12px;
-      }
-
-      #editor {
-        min-height: 330px;
-        padding: 15px;
-      }
-
-      .settings-panel {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .settings-panel .panel-heading,
-      .settings-panel .divider,
-      .settings-panel .format-note,
-      .settings-panel .download-button,
-      .settings-panel .clear-button {
-        grid-column: auto;
-      }
-
-      .features {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (hover: none), (pointer: coarse) {
-      .mouse-glow {
-        display: none;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* تنظیم صفحه چاپی */
-    @media print {
-      @page {
-        size: A4;
-        margin: 18mm;
-      }
-
-      html,
-      body {
-        width: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        color: #111 !important;
-        background: #fff !important;
-        overflow: visible !important;
-      }
-
-      body * {
-        visibility: hidden !important;
-      }
-
-      .mouse-glow,
-      .site-header,
-      .page,
-      .site-footer,
-      .toast {
-        display: none !important;
-      }
-
-      .print-document,
-      .print-document * {
-        visibility: visible !important;
-      }
-
-      .print-document {
-        display: block !important;
-        position: absolute !important;
-        top: 0 !important;
-        right: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        color: #111 !important;
-        background: #fff !important;
-      }
-
-      #printContent {
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        color: #111;
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        line-height: 1.9;
-        font-family: Tahoma, Arial, sans-serif;
-        font-size: 14pt;
-        direction: rtl;
-        text-align: start;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TextFlow Pro — Online Text Editor & PDF Maker</title>
+<meta name="description" content="Write, format and save documents as PDF with TextFlow Pro, a beautiful and easy online text editor.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://hbb3000.github.io/SITE/">
+<meta name="theme-color" content="#080b16">
+<meta property="og:title" content="TextFlow Pro — Write. Design. Export.">
+<meta property="og:description" content="A modern online writing space with elegant tools and PDF export.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hbb3000.github.io/SITE/">
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #080b16;
+  --panel: rgba(17, 23, 43, .78);
+  --panel2: rgba(22, 31, 57, .85);
+  --blue: #5790ff;
+  --cyan: #6de1ff;
+  --purple: #8b75ff;
+  --text: #f1f5ff;
+  --muted: #8795b5;
+  --border: rgba(137, 166, 255, .16);
+  --radius: 22px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(40, 91, 213, .21), transparent 34%),
+    radial-gradient(ellipse at 95% 35%, rgba(102, 65, 222, .15), transparent 33%),
+    radial-gradient(ellipse at 45% 95%, rgba(18, 116, 177, .12), transparent 36%),
+    var(--bg);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+button, input, textarea, select { font: inherit; }
+button, select { cursor: pointer; }
+button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+::selection { background: #528cff66; color: white; }
+
+/* Decorative background */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .19;
+  background-image:
+    linear-gradient(rgba(135, 164, 255, .09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(135, 164, 255, .09) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, black, transparent 88%);
+}
+
+.orb {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .12;
+  animation: float 14s ease-in-out infinite alternate;
+}
+
+.orb.one { background: #387bff; top: 10%; left: -220px; }
+.orb.two { background: #7355ff; top: 45%; right: -230px; animation-delay: -5s; }
+
+@keyframes float {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(55px, -45px, 0); }
+}
+
+/* Cursor glow */
+.mouse-glow {
+  position: fixed;
+  z-index: 1;
+  top: -500px;
+  left: -500px;
+  width: 390px;
+  height: 390px;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle,
+    rgba(63, 128, 255, .18),
+    rgba(67, 101, 255, .09) 32%,
+    rgba(73, 106, 255, .025) 60%,
+    transparent 72%);
+  will-change: left, top;
+}
+
+header, main, footer, .toast, .print-document {
+  position: relative;
+  z-index: 2;
+}
+
+/* Navigation */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid rgba(133, 160, 255, .12);
+  background: rgba(8, 11, 22, .75);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.nav {
+  max-width: 1380px;
+  min-height: 78px;
+  margin: auto;
+  padding: 13px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.logo {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: white;
+  font-size: 24px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #79b6ff, #5262f5 65%, #8b65ff);
+  box-shadow: 0 0 30px #4b7bff40;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -.8px;
+  line-height: 1.25;
+}
+
+.brand h1 span {
+  color: #7eb5ff;
+}
+
+.brand p {
+  margin: 3px 0 0;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+.nav-right { display: flex; align-items: center; gap: 12px; }
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  background: #5d8fff0d;
+  color: #b7c9ed;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #64e6b1;
+  box-shadow: 0 0 12px #64e6b1;
+}
+
+/* Main layout */
+main {
+  width: min(1200px, calc(100% - 36px));
+  margin: auto;
+  padding: 50px 0 45px;
+}
+
+.hero {
+  max-width: 760px;
+  text-align: center;
+  margin: 0 auto 38px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  border: 1px solid #6996ff30;
+  border-radius: 30px;
+  background: #447fff12;
+  color: #a9caff;
+  font-size: 11px;
+  letter-spacing: .4px;
+}
+
+.eyebrow i {
+  width: 7px;
+  height: 7px;
+  background: var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 13px var(--cyan);
+}
+
+.hero h2 {
+  margin: 20px 0 12px;
+  font-size: clamp(35px, 5vw, 61px);
+  line-height: 1.15;
+  letter-spacing: -2.5px;
+  font-weight: 800;
+}
+
+.gradient-text {
+  color: transparent;
+  background: linear-gradient(100deg, #70baff, #8c89ff 55%, #69e4ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.hero > p {
+  max-width: 600px;
+  margin: 0 auto;
+  color: #9aa9c8;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 23px;
+}
+
+.stat {
+  padding: 8px 13px;
+  border: 1px solid rgba(135, 165, 255, .12);
+  border-radius: 10px;
+  background: #111a2d70;
+  color: #aebee0;
+  font-size: 11px;
+}
+
+/* Panels */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 22px;
+  align-items: start;
+}
+
+.panel {
+  min-width: 0;
+  padding: 23px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: 0 24px 70px #00000025, inset 0 1px #ffffff05;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: border-color .3s, box-shadow .3s, transform .3s;
+}
+
+.panel:hover {
+  border-color: #759fff42;
+  box-shadow: 0 24px 70px #00000030, 0 0 32px #477eff0d;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 19px;
+}
+
+.panel-head h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #9fb2d5;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #66e0b0;
+  box-shadow: 0 0 10px #66e0b077;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 11px;
+  margin-bottom: 13px;
+  border: 1px solid #8aaaff17;
+  border-radius: 14px;
+  background: #070c18a8;
+}
+
+.tool {
+  min-height: 38px;
+  padding: 7px 11px;
+  color: #d9e6ff;
+  border: 1px solid #91b0ff20;
+  border-radius: 9px;
+  background: #26375885;
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+
+.tool:hover {
+  border-color: #79a5ff85;
+  background: #3d5d9a7a;
+}
+
+.tool.active {
+  border-color: #659bff;
+  background: #4879e657;
+  box-shadow: 0 0 15px #467bff20;
+}
+
+.tool strong { font-family: Georgia, serif; font-size: 15px; }
+.tool-select { max-width: 100%; }
+.tool option, .field select option { color: #15203a; background: white; }
+
+/* Editor */
+#editor {
+  display: block;
+  width: 100%;
+  min-height: 405px;
+  padding: 22px;
+  resize: vertical;
+  border: 1px solid #8aaaff20;
+  border-radius: 15px;
+  outline: none;
+  background: rgba(5, 9, 19, .6);
+  color: #f0f4ff;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.9;
+  text-align: left;
+  direction: ltr;
+  transition: border-color .25s, box-shadow .25s;
+}
+
+#editor::placeholder { color: #667795; opacity: 1; }
+
+#editor:focus {
+  border-color: #6299ff90;
+  box-shadow: 0 0 0 4px #538aff12, 0 0 28px #4c7cff0a;
+}
+
+.editor-bottom {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.counters { display: flex; gap: 16px; flex-wrap: wrap; }
+.counters strong { color: #dce7ff; font-weight: 600; }
+
+.local-note { display: flex; gap: 7px; align-items: center; }
+
+/* Settings */
+.settings { display: flex; flex-direction: column; gap: 18px; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { color: #bdcbe7; font-size: 11px; font-weight: 600; }
+
+.field input, .field select {
+  width: 100%;
+  min-height: 43px;
+  padding: 9px 12px;
+  color: #e7eeff;
+  border: 1px solid #91b0ff25;
+  border-radius: 10px;
+  background: #070c19a8;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: #659bff;
+  box-shadow: 0 0 0 3px #528bff18;
+}
+
+.field input[type="color"] { padding: 5px; height: 44px; cursor: pointer; }
+.hint { margin: 0; color: #8091b0; font-size: 10px; line-height: 1.7; }
+
+.separator { height: 1px; background: #91b0ff17; }
+
+.primary, .secondary {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 15px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 12px;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+
+.primary {
+  color: white;
+  border: 1px solid #9dbaff60;
+  background: linear-gradient(115deg, #4b91ff, #555df0 58%, #805fff);
+  box-shadow: 0 8px 27px #4b75ff2a;
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px #4b75ff4a, 0 0 22px #537dff18;
+}
+
+.secondary {
+  color: #d0dcf5;
+  border: 1px solid #91b0ff25;
+  background: #26375855;
+}
+
+.secondary:hover {
+  transform: translateY(-1px);
+  border-color: #86a9ff60;
+}
+
+.info-box {
+  padding: 13px;
+  color: #a8c5f5;
+  font-size: 10px;
+  line-height: 1.9;
+  border: 1px solid #6996ff23;
+  border-radius: 12px;
+  background: #447fff0d;
+}
+
+.info-box strong { color: #d0e0ff; }
+
+/* Feature cards */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.feature {
+  padding: 19px;
+  border: 1px solid #8aaaff17;
+  border-radius: 17px;
+  background: #121a2d80;
+  transition: transform .25s, border-color .25s, background .25s;
+}
+
+.feature:hover {
+  transform: translateY(-4px);
+  border-color: #80a5ff40;
+  background: #18233dba;
+}
+
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 13px;
+  color: #a9ccff;
+  font-size: 18px;
+  border: 1px solid #7ea6ff20;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #528bff24, #8a6dff17);
+}
+
+.feature h4 { margin: 0 0 7px; font-size: 13px; }
+.feature p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.9; }
+
+footer {
+  padding: 23px 15px 30px;
+  text-align: center;
+  border-top: 1px solid #8aaaff12;
+  color: #7888a8;
+  font-size: 11px;
+}
+
+footer strong { color: #8cbaff; font-weight: 700; }
+
+.toast {
+  position: fixed;
+  z-index: 30;
+  bottom: 22px;
+  left: 22px;
+  max-width: calc(100% - 44px);
+  padding: 12px 17px;
+  color: #edf3ff;
+  border: 1px solid #8baaff40;
+  border-radius: 12px;
+  background: #172442;
+  box-shadow: 0 12px 35px #0006;
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .25s, transform .25s;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Print-only document */
+.print-document { display: none; }
+
+@media (max-width: 900px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+  .settings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .settings .panel-head, .settings .separator,
+  .settings .info-box, .settings .primary,
+  .settings .secondary { grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+  .nav { padding: 12px 17px; }
+  .nav-right .status { display: none; }
+  main { width: calc(100% - 22px); padding-top: 32px; }
+  .hero h2 { letter-spacing: -1.3px; }
+  .hero > p { font-size: 12px; }
+  .panel { padding: 15px; border-radius: 17px; }
+  .toolbar { gap: 7px; padding: 9px; }
+  .tool { padding: 6px 9px; font-size: 11px; }
+  #editor { min-height: 330px; padding: 15px; }
+  .settings { grid-template-columns: minmax(0, 1fr); }
+  .settings .panel-head, .settings .separator,
+  .settings .info-box, .settings .primary,
+  .settings .secondary { grid-column: auto; }
+  .features { grid-template-columns: 1fr; }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .mouse-glow { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  @page { size: A4; margin: 18mm; }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    color: #111 !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  body * { visibility: hidden !important; }
+
+  .ambient, .mouse-glow, header, main, footer, .toast {
+    display: none !important;
+  }
+
+  .print-document, .print-document * {
+    visibility: visible !important;
+  }
+
+  .print-document {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    color: #111 !important;
+    background: white !important;
+  }
+
+  #printContent {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #111;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.8;
+    font-family: Arial, sans-serif;
+  }
+}
+</style>
 </head>
 
 <body>
-  <div class="mouse-glow" aria-hidden="true"></div>
+<div class="ambient" aria-hidden="true">
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+</div>
+<div class="mouse-glow" aria-hidden="true"></div>
 
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand">
-        <div class="brand-icon">T</div>
-        <div>
-          <h1 class="brand-name">Text<span>Flow</span></h1>
-          <p class="brand-subtitle">WRITE · FORMAT · SAVE</p>
-        </div>
+<header>
+  <nav class="nav">
+    <div class="brand">
+      <div class="logo">T</div>
+      <div>
+        <h1>Text<span>Flow</span> Pro</h1>
+        <p>WRITE. DESIGN. EXPORT.</p>
       </div>
-
-      <div class="header-badge">فضای نوشتن ساده و سریع</div>
     </div>
-  </header>
+    <div class="nav-right">
+      <div class="status"><span class="status-dot"></span> Ready to create</div>
+    </div>
+  </nav>
+</header>
 
-  <main class="page">
-    <section class="hero">
-      <div class="hero-label">ابزار آنلاین نوشتن و ذخیره متن</div>
-      <h2>متنت را بنویس، <span>PDF بگیر.</span></h2>
-      <p>
-        یک فضای ساده و زیبا برای نوشتن و تنظیم متن؛
-        اندازه، فونت و رنگ را انتخاب کن و سندت را به صورت PDF ذخیره کن.
-      </p>
-    </section>
-
-    <section class="workspace">
-      <div class="panel editor-panel">
-        <div class="panel-heading">
-          <div>
-            <h3>ویرایشگر متن</h3>
-            <p>متن خود را در کادر زیر بنویسید.</p>
-          </div>
-          <div class="live-indicator">آماده نوشتن</div>
-        </div>
-
-        <div class="toolbar" aria-label="ابزارهای ویرایش">
-          <button class="tool-button" id="boldButton" type="button"
-                  aria-pressed="false" title="تغییر ضخامت متن">
-            <strong>B</strong>
-          </button>
-
-          <button class="tool-button" id="italicButton" type="button"
-                  aria-pressed="false" title="تغییر حالت متن">
-            <strong><em>I</em></strong>
-          </button>
-
-          <select class="tool-select" id="fontFamily" aria-label="نوع فونت">
-            <option value="Tahoma">Tahoma</option>
-            <option value="Arial">Arial</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Courier New">Courier New</option>
-          </select>
-
-          <select class="tool-select" id="fontSize" aria-label="اندازه فونت">
-            <option value="12">۱۲</option>
-            <option value="14">۱۴</option>
-            <option value="16" selected>۱۶</option>
-            <option value="18">۱۸</option>
-            <option value="20">۲۰</option>
-            <option value="24">۲۴</option>
-            <option value="28">۲۸</option>
-            <option value="32">۳۲</option>
-            <option value="40">۴۰</option>
-          </select>
-        </div>
-
-        <div class="editor-wrap">
-          <textarea
-            id="editor"
-            dir="auto"
-            spellcheck="true"
-            aria-label="متن شما"
-            placeholder="از اینجا شروع کن...
-
-متن خود را بنویس یا در این قسمت جای‌گذاری کن. سپس می‌توانی تنظیمات آن را تغییر دهی و PDF بگیری."
-          ></textarea>
-        </div>
-
-        <div class="editor-footer">
-          <div class="counter-group">
-            <span>کلمات: <strong id="wordCount">۰</strong></span>
-            <span>حروف: <strong id="charCount">۰</strong></span>
-          </div>
-          <div class="privacy-note">
-            <span>🔒</span>
-            <span>متن در همین صفحه پردازش می‌شود.</span>
-          </div>
-        </div>
-      </div>
-
-      <aside class="panel settings-panel">
-        <div class="panel-heading">
-          <div>
-            <h3>تنظیمات سند</h3>
-            <p>ظاهر خروجی خود را مشخص کن.</p>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="fileName">نام فایل</label>
-          <input id="fileName" type="text" value="TextFlow-Document"
-                 maxlength="100" placeholder="نام فایل">
-        </div>
-
-        <div class="field">
-          <label for="pageSize">اندازه صفحه PDF</label>
-          <select id="pageSize">
-            <option value="A4" selected>A4 ـ استاندارد</option>
-            <option value="Letter">Letter</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="textColor">رنگ متن در خروجی</label>
-          <input id="textColor" type="color" value="#111111">
-          <p class="hint">این رنگ هنگام چاپ یا ذخیره PDF استفاده می‌شود.</p>
-        </div>
-
-        <div class="divider"></div>
-
-        <button class="download-button" id="downloadButton" type="button">
-          <span>↓</span>
-          ذخیره به صورت PDF
-        </button>
-
-        <button class="clear-button" id="clearButton" type="button">
-          <span>✕</span>
-          پاک کردن متن
-        </button>
-
-        <div class="format-note">
-          <strong>راهنمای ذخیره:</strong>
-          پس از زدن دکمه PDF، در پنجره چاپ مرورگر گزینه
-          «Save as PDF» یا «ذخیره به‌صورت PDF» را انتخاب کن.
-          اگر رنگ یا اندازه صفحه مهم است، تنظیمات چاپ را هم بررسی کن.
-        </div>
-      </aside>
-    </section>
-
-    <section class="features" aria-label="ویژگی‌های سایت">
-      <article class="feature">
-        <div class="feature-icon">✎</div>
-        <h4>نوشتن آسان</h4>
-        <p>متن را تایپ کن، جای‌گذاری کن و تعداد کلمات و حروف را زنده ببین.</p>
-      </article>
-
-      <article class="feature">
-        <div class="feature-icon">Aa</div>
-        <h4>تنظیم ظاهر</h4>
-        <p>نوع و اندازه فونت و حالت ضخیم یا کج را تنظیم کن.</p>
-      </article>
-
-      <article class="feature">
-        <div class="feature-icon">▤</div>
-        <h4>خروجی PDF</h4>
-        <p>از پنجره چاپ مرورگر برای ذخیره سند به صورت PDF استفاده کن.</p>
-      </article>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    ساخته‌شده با <span>TextFlow</span> · ساده، سریع و کاربردی
-  </footer>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <section class="print-document" aria-hidden="true">
-    <div id="printContent"></div>
+<main>
+  <section class="hero">
+    <div class="eyebrow"><i></i> YOUR MODERN WRITING SPACE</div>
+    <h2>Turn your words into<br><span class="gradient-text">something beautiful.</span></h2>
+    <p>
+      A clean, distraction-free editor designed for your ideas.
+      Write, customize your document, and save it as a PDF in just a few clicks.
+    </p>
+    <div class="hero-stats">
+      <span class="stat">✦ Clean workspace</span>
+      <span class="stat">↗ Live word counter</span>
+      <span class="stat">▤ PDF export</span>
+    </div>
   </section>
 
-  <script>
-    (function () {
-      "use strict";
+  <section class="workspace">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Document Editor</h3>
+          <p>Your ideas start here.</p>
+        </div>
+        <div class="live">Live editing</div>
+      </div>
 
-      const editor = document.getElementById("editor");
-      const wordCount = document.getElementById("wordCount");
-      const charCount = document.getElementById("charCount");
-      const fontFamily = document.getElementById("fontFamily");
-      const fontSize = document.getElementById("fontSize");
-      const boldButton = document.getElementById("boldButton");
-      const italicButton = document.getElementById("italicButton");
-      const textColor = document.getElementById("textColor");
-      const pageSize = document.getElementById("pageSize");
-      const fileName = document.getElementById("fileName");
-      const printContent = document.getElementById("printContent");
-      const toast = document.getElementById("toast");
+      <div class="toolbar">
+        <button class="tool" id="boldButton" type="button" aria-pressed="false" title="Toggle bold">
+          <strong>B</strong>
+        </button>
+        <button class="tool" id="italicButton" type="button" aria-pressed="false" title="Toggle italic">
+          <strong><em>I</em></strong>
+        </button>
 
-      let isBold = false;
-      let isItalic = false;
-      let toastTimeout;
+        <select class="tool tool-select" id="fontFamily" aria-label="Font family">
+          <option value="Arial">Arial</option>
+          <option value="Tahoma">Tahoma</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Courier New">Courier New</option>
+        </select>
 
-      function showToast(message) {
-        toast.textContent = message;
-        toast.classList.add("show");
+        <select class="tool tool-select" id="fontSize" aria-label="Font size">
+          <option value="12">12 px</option>
+          <option value="14">14 px</option>
+          <option value="16" selected>16 px</option>
+          <option value="18">18 px</option>
+          <option value="20">20 px</option>
+          <option value="24">24 px</option>
+          <option value="28">28 px</option>
+          <option value="32">32 px</option>
+          <option value="40">40 px</option>
+        </select>
+      </div>
 
-        clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(function () {
-          toast.classList.remove("show");
-        }, 2800);
-      }
+      <textarea id="editor" spellcheck="true" aria-label="Document text"
+        placeholder="Start writing your next idea...
 
-      function toPersianNumber(number) {
-        return String(number).replace(/\d/g, function (digit) {
-          return "۰۱۲۳۴۵۶۷۸۹"[Number(digit)];
-        });
-      }
+Type or paste your text here. Customize the appearance and export your document as a PDF when you're ready."></textarea>
 
-      function updateCounters() {
-        const text = editor.value;
-        const trimmed = text.trim();
-        const words = trimmed ? trimmed.split(/\s+/u).length : 0;
+      <div class="editor-bottom">
+        <div class="counters">
+          <span>Words: <strong id="wordCount">0</strong></span>
+          <span>Characters: <strong id="charCount">0</strong></span>
+        </div>
+        <div class="local-note"><span>🔒</span><span>Processed in your browser</span></div>
+      </div>
+    </div>
 
-        wordCount.textContent = toPersianNumber(words);
-        charCount.textContent = toPersianNumber(text.length);
-      }
+    <aside class="panel settings">
+      <div class="panel-head">
+        <div>
+          <h3>Document Settings</h3>
+          <p>Make it your own.</p>
+        </div>
+      </div>
 
-      function updateEditorStyle() {
-        editor.style.fontFamily = '"' + fontFamily.value + '", Tahoma, Arial, sans-serif';
-        editor.style.fontSize = fontSize.value + "px";
-        editor.style.fontWeight = isBold ? "700" : "400";
-        editor.style.fontStyle = isItalic ? "italic" : "normal";
+      <div class="field">
+        <label for="fileName">File name</label>
+        <input id="fileName" type="text" maxlength="100" value="TextFlow-Document" placeholder="My document">
+      </div>
 
-        boldButton.classList.toggle("active", isBold);
-        italicButton.classList.toggle("active", isItalic);
+      <div class="field">
+        <label for="pageSize">Page size</label>
+        <select id="pageSize">
+          <option value="A4" selected>A4 — Standard</option>
+          <option value="Letter">Letter — US</option>
+        </select>
+      </div>
 
-        boldButton.setAttribute("aria-pressed", String(isBold));
-        italicButton.setAttribute("aria-pressed", String(isItalic));
-      }
+      <div class="field">
+        <label for="textColor">Export text color</label>
+        <input id="textColor" type="color" value="#111111">
+        <p class="hint">Choose the text color for your exported document.</p>
+      </div>
 
-      boldButton.addEventListener("click", function () {
-        isBold = !isBold;
-        updateEditorStyle();
-      });
+      <div class="separator"></div>
 
-      italicButton.addEventListener("click", function () {
-        isItalic = !isItalic;
-        updateEditorStyle();
-      });
+      <button class="primary" id="downloadButton" type="button">
+        <span>↓</span> Export as PDF
+      </button>
 
-      fontFamily.addEventListener("change", updateEditorStyle);
-      fontSize.addEventListener("change", updateEditorStyle);
-      editor.addEventListener("input", updateCounters);
+      <button class="secondary" id="clearButton" type="button">
+        <span>✕</span> Clear document
+      </button>
 
-      document.getElementById("clearButton").addEventListener("click", function () {
-        if (!editor.value) {
-          showToast("متن از قبل خالی است.");
-          return;
-        }
+      <div class="info-box">
+        <strong>Quick tip</strong><br>
+        Click Export as PDF, then choose <strong>Save as PDF</strong>
+        in your browser's print window. You can choose where to save the file.
+      </div>
+    </aside>
+  </section>
 
-        if (confirm("آیا مطمئنی که می‌خواهی تمام متن پاک شود؟")) {
-          editor.value = "";
-          updateCounters();
-          editor.focus();
-          showToast("متن پاک شد.");
-        }
-      });
+  <section class="features">
+    <article class="feature">
+      <div class="feature-icon">✎</div>
+      <h4>A focused workspace</h4>
+      <p>Enjoy a clean writing area with a live word and character counter.</p>
+    </article>
+    <article class="feature">
+      <div class="feature-icon">Aa</div>
+      <h4>Personalize your text</h4>
+      <p>Adjust the font family, size, and basic text styling with ease.</p>
+    </article>
+    <article class="feature">
+      <div class="feature-icon">▤</div>
+      <h4>Export with ease</h4>
+      <p>Prepare a print-ready document and save it as a PDF through your browser.</p>
+    </article>
+  </section>
+</main>
 
-      function preparePrint() {
-        if (!editor.value.trim()) {
-          showToast("ابتدا متنی وارد کن.");
-          editor.focus();
-          return false;
-        }
+<footer>
+  Crafted for your ideas · <strong>TextFlow Pro</strong>
+</footer>
 
-        printContent.textContent = editor.value;
-        printContent.style.fontFamily =
-          '"' + fontFamily.value + '", Tahoma, Arial, sans-serif';
-        printContent.style.fontSize = fontSize.value + "pt";
-        printContent.style.fontWeight = isBold ? "700" : "400";
-        printContent.style.fontStyle = isItalic ? "italic" : "normal";
-        printContent.style.color = textColor.value;
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-        const text = editor.value;
-        const firstStrongCharacter = text.match(/[\u0600-\u06FF]/);
-        printContent.style.direction = firstStrongCharacter ? "rtl" : "ltr";
-        printContent.style.textAlign = firstStrongCharacter ? "right" : "left";
+<section class="print-document" aria-hidden="true">
+  <div id="printContent"></div>
+</section>
 
-        const chosenSize = pageSize.value;
-        let pageStyle = document.getElementById("dynamicPageStyle");
+<script>
+(function () {
+  "use strict";
 
-        if (!pageStyle) {
-          pageStyle = document.createElement("style");
-          pageStyle.id = "dynamicPageStyle";
-          document.head.appendChild(pageStyle);
-        }
+  const editor = document.getElementById("editor");
+  const wordCount = document.getElementById("wordCount");
+  const charCount = document.getElementById("charCount");
+  const fontFamily = document.getElementById("fontFamily");
+  const fontSize = document.getElementById("fontSize");
+  const boldButton = document.getElementById("boldButton");
+  const italicButton = document.getElementById("italicButton");
+  const textColor = document.getElementById("textColor");
+  const pageSize = document.getElementById("pageSize");
+  const fileName = document.getElementById("fileName");
+  const printContent = document.getElementById("printContent");
+  const toast = document.getElementById("toast");
 
-        pageStyle.textContent =
-          "@media print { @page { size: " + chosenSize + "; margin: 18mm; } }";
+  let isBold = false;
+  let isItalic = false;
+  let toastTimer;
 
-        const safeName = fileName.value.trim()
-          .replace(/[\\/:*?"<>|]/g, "-")
-          .replace(/\s+/g, "-")
-          .slice(0, 100);
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toast.classList.remove("show");
+    }, 3000);
+  }
 
-        document.title = safeName || "TextFlow-Document";
-        return true;
-      }
+  function updateCounters() {
+    const value = editor.value;
+    const trimmed = value.trim();
+    wordCount.textContent = trimmed ? trimmed.split(/\s+/u).length : 0;
+    charCount.textContent = value.length;
+  }
 
-      document.getElementById("downloadButton").addEventListener("click", function () {
-        if (!preparePrint()) return;
+  function updateStyle() {
+    editor.style.fontFamily = '"' + fontFamily.value + '", Arial, sans-serif';
+    editor.style.fontSize = fontSize.value + "px";
+    editor.style.fontWeight = isBold ? "700" : "400";
+    editor.style.fontStyle = isItalic ? "italic" : "normal";
 
-        showToast("در پنجره چاپ، گزینه Save as PDF را انتخاب کن.");
+    boldButton.classList.toggle("active", isBold);
+    italicButton.classList.toggle("active", isItalic);
+    boldButton.setAttribute("aria-pressed", String(isBold));
+    italicButton.setAttribute("aria-pressed", String(isItalic));
+  }
 
-        setTimeout(function () {
-          window.print();
-        }, 250);
-      });
+  boldButton.addEventListener("click", function () {
+    isBold = !isBold;
+    updateStyle();
+  });
 
-      window.addEventListener("afterprint", function () {
-        document.title = "TextFlow | تبدیل متن به PDF";
-      });
+  italicButton.addEventListener("click", function () {
+    isItalic = !isItalic;
+    updateStyle();
+  });
 
-      /* نور دنبال‌کننده موس */
-      const glow = document.querySelector(".mouse-glow");
-      let frameRequested = false;
-      let pointerX = -500;
-      let pointerY = -500;
+  fontFamily.addEventListener("change", updateStyle);
+  fontSize.addEventListener("change", updateStyle);
+  editor.addEventListener("input", updateCounters);
 
-      window.addEventListener("pointermove", function (event) {
-        if (!glow || event.pointerType === "touch") return;
+  document.getElementById("clearButton").addEventListener("click", function () {
+    if (!editor.value) {
+      showToast("Your document is already empty.");
+      return;
+    }
 
-        pointerX = event.clientX;
-        pointerY = event.clientY;
-
-        if (frameRequested) return;
-        frameRequested = true;
-
-        requestAnimationFrame(function () {
-          glow.style.left = pointerX + "px";
-          glow.style.top = pointerY + "px";
-          frameRequested = false;
-        });
-      }, { passive: true });
-
-      window.addEventListener("blur", function () {
-        if (!glow) return;
-        glow.style.left = "-500px";
-        glow.style.top = "-500px";
-      });
-
+    if (confirm("Are you sure you want to clear the entire document?")) {
+      editor.value = "";
       updateCounters();
-      updateEditorStyle();
-    })();
-  </script>
+      editor.focus();
+      showToast("Document cleared.");
+    }
+  });
+
+  function preparePrint() {
+    if (!editor.value.trim()) {
+      showToast("Please enter some text first.");
+      editor.focus();
+      return false;
+    }
+
+    printContent.textContent = editor.value;
+    printContent.style.fontFamily = '"' + fontFamily.value + '", Arial, sans-serif';
+    printContent.style.fontSize = fontSize.value + "pt";
+    printContent.style.fontWeight = isBold ? "700" : "400";
+    printContent.style.fontStyle = isItalic ? "italic" : "normal";
+    printContent.style.color = textColor.value;
+    printContent.style.direction = "ltr";
+    printContent.style.textAlign = "left";
+
+    let pageStyle = document.getElementById("dynamicPageStyle");
+    if (!pageStyle) {
+      pageStyle = document.createElement("style");
+      pageStyle.id = "dynamicPageStyle";
+      document.head.appendChild(pageStyle);
+    }
+
+    pageStyle.textContent =
+      "@media print { @page { size: " + pageSize.value + "; margin: 18mm; } }";
+
+    const safeName = fileName.value.trim()
+      .replace(/[\\/:*?"<>|]/g, "-")
+      .replace(/\s+/g, "-")
+      .slice(0, 100);
+
+    document.title = safeName || "TextFlow-Document";
+    return true;
+  }
+
+  document.getElementById("downloadButton").addEventListener("click", function () {
+    if (!preparePrint()) return;
+    showToast("Choose Save as PDF in the print window.");
+    setTimeout(function () {
+      window.print();
+    }, 250);
+  });
+
+  window.addEventListener("afterprint", function () {
+    document.title = "TextFlow Pro — Online Text Editor & PDF Maker";
+  });
+
+  /* Smooth blue cursor light */
+  const glow = document.querySelector(".mouse-glow");
+  let pointerX = -500;
+  let pointerY = -500;
+  let framePending = false;
+
+  window.addEventListener("pointermove", function (event) {
+    if (!glow || event.pointerType === "touch") return;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+
+    if (framePending) return;
+    framePending = true;
+
+    requestAnimationFrame(function () {
+      glow.style.left = pointerX + "px";
+      glow.style.top = pointerY + "px";
+      framePending = false;
+    });
+  }, { passive: true });
+
+  window.addEventListener("blur", function () {
+    if (!glow) return;
+    glow.style.left = "-500px";
+    glow.style.top = "-500px";
+  });
+
+  updateCounters();
+  updateStyle();
+})();
+</script>
 </body>
 </html>
